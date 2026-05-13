@@ -54,7 +54,9 @@ FROM core-base AS desktop-builder
                     libgl1-mesa-dev \
                     libegl1-mesa-dev \
                     libasound2-dev \
-                    libpulse-dev
+                    libpulse-dev \
+                    libnss3-dev \
+                    libnspr4-dev
 
     COPY desktop-sdk /desktop-sdk
     COPY desktop-apps /desktop-apps
