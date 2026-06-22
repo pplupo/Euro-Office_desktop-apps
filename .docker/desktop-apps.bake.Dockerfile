@@ -30,6 +30,7 @@ FROM core-base AS desktop-builder
                     bison \
                     libnotify-dev \
                     libcups2-dev \
+                    libwayland-dev \
                     libdbus-1-dev \
                     libxcb-util0-dev \
                     libxcb-xkb-dev \
