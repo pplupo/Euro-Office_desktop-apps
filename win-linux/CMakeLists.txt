@@ -279,6 +279,9 @@ elseif(UNIX AND NOT APPLE)
         src/platform_linux/gtkprintdialog.cpp
         src/platform_linux/gtkutils.cpp
         src/platform_linux/linux_window_utils.cpp
+        src/platform_linux/x11backend.cpp
+        src/platform_linux/waylandbackend.cpp
+        src/platform_linux/platformbackendfactory.cpp
         extras/update-daemon/src/classes/csocket.cpp
     )
     list(APPEND COMMON_HEADERS 
@@ -294,11 +297,20 @@ elseif(UNIX AND NOT APPLE)
         src/platform_linux/gtkprintdialog.h
         src/platform_linux/gtkutils.h
         src/platform_linux/linux_window_utils.h
+        src/platform_linux/iplatformbackend.h
+        src/platform_linux/x11backend.h
+        src/platform_linux/waylandbackend.h
         extras/update-daemon/src/classes/csocket.h
     )
 
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(GTK3 REQUIRED glib-2.0 gtk+-3.0 atk gtk+-unix-print-3.0 xcb xext libnotify)
+    pkg_check_modules(GTK3 REQUIRED glib-2.0 gtk+-3.0 atk gtk+-unix-print-3.0 libnotify)
+    pkg_check_modules(XCB_LIBS xcb xext)
+    pkg_check_modules(X11_LIBS x11 x11-xcb)
+    if(XCB_LIBS_FOUND AND X11_LIBS_FOUND)
+        add_definitions(-DHAVE_X11)
+    endif()
+    add_definitions(-DHAVE_WAYLAND)
 
     # Custom command for glib-compile-resources
     set(GRESOURCE_XML ${CMAKE_CURRENT_SOURCE_DIR}/res/gresource.xml)
@@ -310,7 +322,10 @@ elseif(UNIX AND NOT APPLE)
     )
     list(APPEND COMMON_SOURCES ${GRESOURCE_C})
     
-    set(PLATFORM_LIBS ${GTK3_LIBRARIES} X11 X11-xcb cups)
+    set(PLATFORM_LIBS ${GTK3_LIBRARIES} cups)
+    if(XCB_LIBS_FOUND AND X11_LIBS_FOUND)
+        list(APPEND PLATFORM_LIBS ${X11_LIBS_LIBRARIES} ${XCB_LIBS_LIBRARIES})
+    endif()
 endif()
 
 # 7. Create Executable
@@ -386,6 +401,10 @@ target_link_libraries(DesktopEditors PRIVATE
     # --- System Essentials ---
     hunspell_wrapper
     ooxmlsignature
+    dl
+    pthread
+    rt
+    z
 )
 
 if(WIN32)
