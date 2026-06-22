@@ -40,10 +40,15 @@
 #include "chelp.h"
 #include "common/File.h"
 #include <QStyleFactory>
+#include <vector>
+#include <QGuiApplication>
 
 
 int main( int argc, char *argv[] )
 {
+    int new_argc = argc;
+    char** new_argv = argv;
+    std::vector<char*> dynamic_argv;
 #ifdef _WIN32
     Core_SetProcessDpiAwareness();
     Utils::setAppUserModelId();
@@ -53,9 +58,31 @@ int main( int argc, char *argv[] )
         return 0;
     }
 #else
-    qputenv("QT_QPA_PLATFORM", "xcb");
-    qputenv("GDK_BACKEND", "x11");
-    InputArgs::init(argc, argv);
+    dynamic_argv.assign(argv, argv + argc);
+    bool isWayland = false;
+    QByteArray platform = qgetenv("QT_QPA_PLATFORM");
+    if (platform.isEmpty()) {
+        QByteArray sessionType = qgetenv("XDG_SESSION_TYPE");
+        if (sessionType == "wayland") {
+            platform = "wayland";
+        } else {
+            platform = "xcb";
+        }
+        qputenv("QT_QPA_PLATFORM", platform);
+    }
+    isWayland = (platform == "wayland");
+
+    if (isWayland) {
+        qputenv("GDK_BACKEND", "wayland");
+        dynamic_argv.push_back(const_cast<char*>("--ozone-platform=wayland"));
+    } else {
+        qputenv("GDK_BACKEND", "x11");
+    }
+    dynamic_argv.push_back(nullptr);
+    new_argc = dynamic_argv.size() - 1;
+    new_argv = dynamic_argv.data();
+
+    InputArgs::init(new_argc, new_argv);
     if (geteuid() == 0) {
         CMessage::warning(nullptr, WARNING_LAUNCH_WITH_ADMIN_RIGHTS);
         return 0;
@@ -135,7 +162,7 @@ int main( int argc, char *argv[] )
         reg_user.remove("lockPortals");
     }
 
-    SingleApplication app(argc, argv);
+    SingleApplication app(new_argc, new_argv);
 
     if ( !app.isPrimary() ) {
         QString _out_args;
@@ -162,12 +189,15 @@ int main( int argc, char *argv[] )
 
     /* the order is important */
 #ifdef __linux
-    gtk_init(&argc, &argv);
+    gtk_init(&new_argc, &new_argv);
 #endif
-    CApplicationCEF::Prepare(argc, argv);
+    CApplicationCEF::Prepare(new_argc, new_argv);
+    if (QGuiApplication::platformName() == "wayland") {
+        qputenv("GDK_BACKEND", "wayland");
+    }
     CApplicationCEF* application_cef = new CApplicationCEF();
     setup_paths(&AscAppManager::getInstance());
-    application_cef->Init_CEF(&AscAppManager::getInstance(), argc, argv);
+    application_cef->Init_CEF(&AscAppManager::getInstance(), new_argc, new_argv);
     /* ********************** */
 
 //    GET_REGISTRY_SYSTEM(reg_system)
