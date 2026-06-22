@@ -26,20 +26,20 @@
 #ifndef LINUX_WINDOW_UTILS_H
 #define LINUX_WINDOW_UTILS_H
 
-#include <xcb/xcb.h>
+#include <qwindowdefs.h>
 #include <vector>
 
 
 namespace LinuxWindowUtils
 {
-void moveWindow(xcb_window_t window, int x, int y);
-void setNativeFocusTo(xcb_window_t window);
-bool isNativeFocus(xcb_window_t window);
+void moveWindow(WId window, int x, int y);
+void setNativeFocusTo(WId window);
+bool isNativeFocus(WId window);
 void findWindowAsync(const char *window_name, void *user_data,
                      uint timeout_ms,
-                     void(*callback)(xcb_window_t, void*));
-void getWindowStack(std::vector<xcb_window_t> &winStack);
-void setInputEnabled(xcb_window_t window, bool enabled);
+                     void(*callback)(WId, void*));
+void getWindowStack(std::vector<WId> &winStack);
+void setInputEnabled(WId window, bool enabled);
 }
 
 #endif // LINUX_WINDOW_UTILS_H
