@@ -457,7 +457,7 @@ public:
             if (winStack.empty()) {
                 // Wayland fallback: use our tracked editors list
                 for (auto it = m_appmanager.m_vecEditors.rbegin(); it != m_appmanager.m_vecEditors.rend(); it++) {
-                    CEditorWindow *editor = *it;
+                    CEditorWindow *editor = reinterpret_cast<CEditorWindow*>(*it);
                     if (editor && editor->editorType() == etype) {
                         rc = editor->normalGeometry();
                         rc.adjust(50, 50, 50, 50);
