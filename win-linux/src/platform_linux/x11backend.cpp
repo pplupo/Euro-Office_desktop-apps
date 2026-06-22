@@ -380,11 +380,25 @@ void X11Backend::startInteractiveResize(QWidget *window, Qt::Edges edges, const 
 
 void X11Backend::setCursor(WId window, int cursorShape)
 {
+    unsigned int x11_shape = 0;
+    switch (cursorShape) {
+        case 0: x11_shape = 134; break; // XC_top_left_corner
+        case 1: x11_shape = 138; break; // XC_top_side
+        case 2: x11_shape = 136; break; // XC_top_right_corner
+        case 3: x11_shape = 96;  break; // XC_right_side
+        case 4: x11_shape = 14;  break; // XC_bottom_right_corner
+        case 5: x11_shape = 16;  break; // XC_bottom_side
+        case 6: x11_shape = 12;  break; // XC_bottom_left_corner
+        case 7: x11_shape = 70;  break; // XC_left_side
+        default: x11_shape = cursorShape; break; // fallback
+    }
     Display * _display = getXDisplay();
-    Cursor cursor = XCreateFontCursor(_display, (unsigned int)cursorShape);
-    XDefineCursor(_display, (Window)window, cursor);
-    XFlush(_display);
-    XFreeCursor(_display, cursor);
+    if (_display) {
+        Cursor cursor = XCreateFontCursor(_display, x11_shape);
+        XDefineCursor(_display, (Window)window, cursor);
+        XFlush(_display);
+        XFreeCursor(_display, cursor);
+    }
 }
 
 void X11Backend::resetCursor(WId window)

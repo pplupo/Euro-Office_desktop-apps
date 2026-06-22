@@ -126,9 +126,21 @@ void WaylandBackend::startInteractiveResize(QWidget *window, Qt::Edges edges, co
 
 void WaylandBackend::setCursor(WId window, int cursorShape)
 {
+    Qt::CursorShape qt_shape = Qt::ArrowCursor;
+    switch (cursorShape) {
+        case 0: qt_shape = Qt::SizeFDiagCursor; break; // Top-left
+        case 1: qt_shape = Qt::SizeVerCursor;  break; // Top
+        case 2: qt_shape = Qt::SizeBDiagCursor; break; // Top-right
+        case 3: qt_shape = Qt::SizeHorCursor;  break; // Right
+        case 4: qt_shape = Qt::SizeFDiagCursor; break; // Bottom-right
+        case 5: qt_shape = Qt::SizeVerCursor;  break; // Bottom
+        case 6: qt_shape = Qt::SizeBDiagCursor; break; // Bottom-left
+        case 7: qt_shape = Qt::SizeHorCursor;  break; // Left
+        default: qt_shape = Qt::CursorShape(cursorShape); break; // fallback
+    }
     QWidget *widget = QWidget::find(window);
     if (widget)
-        widget->setCursor(Qt::CursorShape(cursorShape));
+        widget->setCursor(qt_shape);
 }
 
 void WaylandBackend::resetCursor(WId window)
