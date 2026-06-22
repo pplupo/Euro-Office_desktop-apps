@@ -38,7 +38,7 @@
 #include <X11/Xutil.h>
 #endif
 #include "platform_linux/linux_window_utils.h"
-#include "iplatformbackend.h"
+#include "platform_linux/iplatformbackend.h"
 
 #define CUSTOM_BORDER_WIDTH MAIN_WINDOW_BORDER_WIDTH
 #define MOTION_TIMER_MS 250

@@ -37,7 +37,7 @@
 #include <xcb/xcb.h>
 #endif
 #include <QGuiApplication>
-#include "iplatformbackend.h"
+#include "platform_linux/iplatformbackend.h"
 
 #ifdef DOCUMENTSCORE_OPENSSL_SUPPORT
 # include "platform_linux/cdialogopenssl.h"
