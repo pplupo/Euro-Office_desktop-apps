@@ -452,8 +452,20 @@ public:
                 do {
                     WId wid = (WId)hWnd;
 #else
-            std::vector<xcb_window_t> winStack;
+            std::vector<WId> winStack;
             LinuxWindowUtils::getWindowStack(winStack);
+            if (winStack.empty()) {
+                // Wayland fallback: use our tracked editors list
+                for (auto it = m_appmanager.m_vecEditors.rbegin(); it != m_appmanager.m_vecEditors.rend(); it++) {
+                    CEditorWindow *editor = *it;
+                    if (editor && editor->editorType() == etype) {
+                        rc = editor->normalGeometry();
+                        rc.adjust(50, 50, 50, 50);
+                        isMaximized = editor->windowState().testFlag(Qt::WindowMaximized);
+                        return;
+                    }
+                }
+            }
             for (auto it = winStack.rbegin(); it != winStack.rend(); it++) {
                 WId wid = (WId)(*it);
 #endif
@@ -470,8 +482,10 @@ public:
                     }
 #ifdef _WIN32
                 } while ((hWnd = GetWindow(hWnd, GW_HWNDNEXT)) != nullptr);
-#endif
             }
+#else
+            }
+#endif
         }
 
         GET_REGISTRY_USER(reg_user);

@@ -190,7 +190,13 @@ void CWindowBase::saveWindowState(const QString &baseKey)
 {
     if (!windowState().testFlag(Qt::WindowFullScreen)) {
         GET_REGISTRY_USER(reg_user)
-        reg_user.setValue(baseKey + "position", normalGeometry());
+        if (QGuiApplication::platformName() == "wayland") {
+            QRect rect = normalGeometry();
+            rect.moveTo(0, 0);
+            reg_user.setValue(baseKey + "position", rect);
+        } else {
+            reg_user.setValue(baseKey + "position", normalGeometry());
+        }
         if (windowState().testFlag(Qt::WindowMaximized)) {
             reg_user.setValue(baseKey + "maximized", true);
         } else {
