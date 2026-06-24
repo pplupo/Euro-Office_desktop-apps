@@ -10,7 +10,8 @@
 # ==============================================================================
 
 #### DESKTOP-APPS
-FROM core-base AS desktop-builder
+FROM core-base AS desktop-linux
+
     ARG PRODUCT_VERSION
     ARG BUILD_NUMBER
     ARG CACHE_BUST=2
@@ -70,7 +71,8 @@ FROM core-base AS desktop-builder
     COPY ${BRANDING_DIR}/desktop-apps /desktop-apps
     ###
 
-    COPY --from=desktop-js /app/loginpage/deploy /desktop-apps/common/loginpage/deploy
+    COPY --from=desktop-common /index.html /desktop-apps/common/loginpage/deploy/index.html
+    COPY --from=desktop-common /editors/webext/noconnect.html /desktop-apps/common/loginpage/deploy/noconnect.html
     #COPY gcc_64 /qt5
 
     ENV PRODUCT_VERSION=${PRODUCT_VERSION}
@@ -82,16 +84,45 @@ FROM core-base AS desktop-builder
 
     RUN --mount=type=cache,target=/build-cache-desktop,id=build-cache-desktop-${CACHE_BUST} \
         --mount=type=cache,target=/nuget-cache,id=nuget-cache-${CACHE_BUST} \
+        --mount=type=cache,target=/ccache,id=ccache \
+        --mount=type=bind,from=third-party,source=/third_party,target=/third_party_src \
+        --mount=type=secret,id=nextcloud_user \
+        --mount=type=secret,id=nextcloud_pass \
+        export NEXTCLOUD_USER="$(cat /run/secrets/nextcloud_user)" && \
+        export NEXTCLOUD_PASS="$(cat /run/secrets/nextcloud_pass)" && \
+        export CCACHE_DIR=/ccache && \
+        cp -a /third_party_src/. /build-cache-desktop/third_party && \
         cd /build-cache-desktop && \
-        cmake -GNinja -DVCPKG_TARGET_TRIPLET=x64-linux-dynamic \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
-              -DVCPKG_MANIFEST_MODE=ON \
-              -DVCPKG_MANIFEST_DIR="/core" \
-              -DVCPKG_MANIFEST_FEATURES="desktop-editors" \
-              -DVCPKG_OVERLAY_PORTS="/core/Common/3dParty" \
-              -DABOUT_PAGE_APP_NAME="${ABOUT_PAGE_APP_NAME}" \
-              /desktop-apps/win-linux/ && \
+        cmake -GNinja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
+            -DVCPKG_MANIFEST_MODE=ON \
+            -DVCPKG_MANIFEST_DIR="/core" \
+            -DABOUT_PAGE_APP_NAME="${ABOUT_PAGE_APP_NAME}" \
+            /desktop-apps/win-linux/ && \
         cmake --build . && \
         cmake --install . && \
+        ccache --show-stats && \
         cp -a desktopeditors /desktopeditors
 
+    COPY --from=desktop-common / /desktopeditors/
+
+    RUN /desktopeditors/converter/allfontsgen \
+        --use-system=1 \
+        --input=/desktopeditors/fonts \
+        --input=/core-fonts \
+        --allfonts=/desktopeditors/converter/AllFonts.js \
+        --selection=/desktopeditors/converter/font_selection.bin 
+    
+    RUN /desktopeditors/converter/allthemesgen \
+        --converter-dir=/desktopeditors/converter \
+        --src=/desktopeditors/editors/sdkjs/slide/themes \
+        --allfonts=/desktopeditors/converter/AllFonts.js \
+        --output=/desktopeditors/editors/sdkjs/common/Images
+
+    RUN rm /desktopeditors/converter/allthemesgen && \
+        rm /desktopeditors/converter/allfontsgen
+
+    RUN echo 'LD_LIBRARY_PATH=$PWD:$PWD/converter:$LD_LIBRARY_PATH LD_PRELOAD=libcef.so ./DesktopEditors' > /desktopeditors/start_desktop.sh && \
+        chmod +x /desktopeditors/start_desktop.sh
