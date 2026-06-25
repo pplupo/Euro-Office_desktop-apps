@@ -42,10 +42,12 @@
 #include <QStyleFactory>
 #include <vector>
 #include <QGuiApplication>
+#include <QDebug>
 
 
 int main( int argc, char *argv[] )
 {
+    bool isWayland = false;
     int new_argc = argc;
     char** new_argv = argv;
     std::vector<char*> dynamic_argv;
@@ -59,7 +61,6 @@ int main( int argc, char *argv[] )
     }
 #else
     dynamic_argv.assign(argv, argv + argc);
-    bool isWayland = false;
     QByteArray platform = qgetenv("QT_QPA_PLATFORM");
     if (platform.isEmpty()) {
         QByteArray sessionType = qgetenv("XDG_SESSION_TYPE");
@@ -92,11 +93,26 @@ int main( int argc, char *argv[] )
         return 0;
     }
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
-#else
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#ifdef __linux
+    char* qpaPlatform = getenv("QT_QPA_PLATFORM");
+    char* xdgSessionType = getenv("XDG_SESSION_TYPE");
+    if ((qpaPlatform && strcmp(qpaPlatform, "wayland") == 0) ||
+        (xdgSessionType && strcmp(xdgSessionType, "wayland") == 0)) {
+        isWayland = true;
+    }
 #endif
+
+    if (!isWayland) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
+#else
+        QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
+    } else {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    }
     QCoreApplication::setAttribute(Qt::AA_Use96Dpi);
     QCoreApplication::setApplicationName(QString::fromUtf8(WINDOW_NAME));
     QApplication::setApplicationDisplayName(QString::fromUtf8(WINDOW_NAME));
@@ -163,6 +179,9 @@ int main( int argc, char *argv[] )
     }
 
     SingleApplication app(new_argc, new_argv);
+    qWarning() << "[WAYLAND-OSR-DEBUG] isWayland =" << isWayland
+               << "QT_QPA_PLATFORM =" << getenv("QT_QPA_PLATFORM")
+               << "platformName =" << QGuiApplication::platformName();
 
     if ( !app.isPrimary() ) {
         QString _out_args;
@@ -189,6 +208,7 @@ int main( int argc, char *argv[] )
 
     /* the order is important */
 #ifdef __linux
+    gtk_disable_setlocale();
     gtk_init(&new_argc, &new_argv);
 #endif
     CApplicationCEF::Prepare(new_argc, new_argv);
