@@ -115,6 +115,11 @@ if(NOT TARGET allthemesgen)
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
 endif()
 
+if(UNIX)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
+    add_definitions(-DLINUX -D_LINUX -D_WAYLAND)
+endif()
+
 # 3. Definitions & Global Config
 add_definitions(-D__DONT_WRITE_IN_APP_TITLE)
 add_definitions(-DAPP_ICON_PATH="./res/icons/desktopeditors-eo.ico")
@@ -426,9 +431,9 @@ endif()
 if(UNIX)
     target_link_libraries(DesktopEditors PRIVATE
         Qt${QT_VERSION_MAJOR}::DBus
-        ${LIBICUUC}
-        ${LIBICUDATA}
-        ${LIBICUI}
+        ${LIBICUUC_DESKTOP}
+        ${LIBICUDATA_DESKTOP}
+        ${LIBICUI_DESKTOP}
     )
 
     target_link_options(DesktopEditors PRIVATE "-Wl,-rpath,$ORIGIN" "-Wl,-rpath,$ORIGIN/converter")
