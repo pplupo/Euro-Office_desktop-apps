@@ -31,7 +31,7 @@ endif()
 set(QT_DIR "${QT_ROOT}/lib/cmake/Qt6")
 set(Qt6_DIR "${QT_ROOT}/lib/cmake/Qt6")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Gui Widgets PrintSupport Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets PrintSupport Svg LinguistTools Multimedia MultimediaWidgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui GuiPrivate Widgets PrintSupport Svg LinguistTools Multimedia MultimediaWidgets)
 
 if(UNIX)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
