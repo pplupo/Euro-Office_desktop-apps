@@ -131,8 +131,8 @@ if(NOT TARGET allthemesgen)
 endif()
 
 if(UNIX)
-    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus X11Extras)
-    add_definitions(-DLINUX -D_LINUX -D_WAYLAND -D_X11)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
+    add_definitions(-DLINUX -D_LINUX -D_WAYLAND)
 endif()
 
 # 3. Definitions & Global Config
@@ -443,7 +443,6 @@ endif()
 if(UNIX)
     target_link_libraries(DesktopEditors PRIVATE
         Qt${QT_VERSION_MAJOR}::DBus
-        Qt${QT_VERSION_MAJOR}::X11Extras
         ${LIBICUUC_DESKTOP}
         ${LIBICUDATA_DESKTOP}
         ${LIBICUI_DESKTOP}
