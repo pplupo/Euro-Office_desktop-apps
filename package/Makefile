@@ -136,11 +136,16 @@ HELP_GLOB := opt/$(DESKTOPEDITORS_PREFIX)/editors/web-apps/apps/*/main/resources
 
 -include $(BRANDING_DIR)/branding.mk
 
-all : deb rpm rpm-suse tar
+all : deb rpm rpm-suse tar flatpak aur
 deb : $(DEB)
 rpm : $(RPM)
 rpm-suse : $(RPM_SUSE)
 tar : $(TAR) $(TAR_HELP)
+flatpak : build flatpak/org.eurooffice.DesktopEditors.yml
+	flatpak-builder --force-clean --repo=flatpak/repo flatpak/build-dir flatpak/org.eurooffice.DesktopEditors.yml
+	flatpak build-bundle flatpak/repo flatpak/org.eurooffice.$(PACKAGE_NAME).flatpak org.eurooffice.$(DESKTOPEDITORS_EXEC)
+aur : build aur/PKGBUILD
+	cd aur && makepkg -cf
 
 clean :
 	rm -rf \
