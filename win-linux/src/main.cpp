@@ -183,9 +183,7 @@ int main( int argc, char *argv[] )
     }
 
     SingleApplication app(new_argc, new_argv);
-    qWarning() << "[WAYLAND-OSR-DEBUG] isWayland =" << isWayland
-               << "QT_QPA_PLATFORM =" << getenv("QT_QPA_PLATFORM")
-               << "platformName =" << QGuiApplication::platformName();
+
 
     if ( !app.isPrimary() ) {
         QString _out_args;
