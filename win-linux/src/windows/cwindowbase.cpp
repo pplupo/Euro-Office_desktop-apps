@@ -75,8 +75,7 @@ CWindowBase::CWindowBase(const QRect& rect)
     } else {
         m_window_rect = startRect(rect, m_dpiRatio);
     }
-    qDebug() << "[WAYLAND-OSR-DEBUG] CWindowBase constructor: platformName =" << QGuiApplication::platformName()
-             << "m_dpiRatio =" << m_dpiRatio;
+
     setMinimumSize(WINDOW_MIN_WIDTH * m_dpiRatio, WINDOW_MIN_HEIGHT * m_dpiRatio);
 #ifdef __linux__
     setGeometry(m_window_rect); // for Windows is set in CWindowPlatform
