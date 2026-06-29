@@ -62,7 +62,8 @@ FROM core-base AS desktop-builder
                     libasound2-dev \
                     libpulse-dev \
                     libnss3-dev \
-                    libnspr4-dev
+                    libnspr4-dev \
+                    mdbtools-dev
 
     COPY desktop-sdk /desktop-sdk
     COPY desktop-apps /desktop-apps
@@ -104,7 +105,7 @@ FROM core-base AS desktop-builder
             -DVCPKG_OVERLAY_PORTS="/core/Common/3dParty" \
             -DABOUT_PAGE_APP_NAME="${ABOUT_PAGE_APP_NAME}" \
             /desktop-apps/win-linux/ && \
-        cmake --build . && \
+        cmake --build . -- -j4 && \
         cmake --install . && \
         ccache --show-stats && \
         cp -a desktopeditors /desktopeditors
