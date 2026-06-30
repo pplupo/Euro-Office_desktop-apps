@@ -105,7 +105,7 @@ FROM core-base AS desktop-builder
             -DVCPKG_OVERLAY_PORTS="/core/Common/3dParty" \
             -DABOUT_PAGE_APP_NAME="${ABOUT_PAGE_APP_NAME}" \
             /desktop-apps/win-linux/ && \
-        cmake --build . -- -j4 && \
+        cmake --build . -- -j2 && \
         cmake --install . && \
         ccache --show-stats && \
         cp -a desktopeditors /desktopeditors
