@@ -34,10 +34,13 @@
 gboolean set_focus(GtkWidget *dialog)
 {
 #ifdef HAVE_X11
-    GdkWindow *gdk_dialog = gtk_widget_get_window(dialog);
-    if (gdk_dialog && GDK_IS_X11_WINDOW(gdk_dialog)) {
-        WId wnd = (WId)gdk_x11_window_get_xid(gdk_dialog);
-        LinuxWindowUtils::setNativeFocusTo(wnd);
+    GdkDisplay *gdk_display = gdk_display_get_default();
+    if (gdk_display && GDK_IS_X11_DISPLAY(gdk_display)) {
+        GdkWindow *gdk_dialog = gtk_widget_get_window(dialog);
+        if (gdk_dialog && GDK_IS_X11_WINDOW(gdk_dialog)) {
+            WId wnd = (WId)gdk_x11_window_get_xid(gdk_dialog);
+            LinuxWindowUtils::setNativeFocusTo(wnd);
+        }
     }
 #endif
     return FALSE;
@@ -46,7 +49,8 @@ gboolean set_focus(GtkWidget *dialog)
 gboolean focus_out(gpointer data)
 {
 #ifdef HAVE_X11
-    if (data) {
+    GdkDisplay *gdk_display = gdk_display_get_default();
+    if (data && gdk_display && GDK_IS_X11_DISPLAY(gdk_display)) {
         DialogTag *tag = (DialogTag*)data;
         GtkWidget *dialog = tag->dialog;
         WId parent_xid = (WId)tag->parent_xid;

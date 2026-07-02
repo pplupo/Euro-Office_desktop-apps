@@ -22,11 +22,10 @@ include(${CORE_ROOT_DIR}/common.cmake)
 
 
 # 2. Find Qt Packages
-if(DEFINED ENV{QT6_ROOT})
-    set(QT_ROOT "$ENV{QT6_ROOT}")
-else()
-    set(QT_ROOT "/qt6/6.11.1/gcc_64")
+if(NOT DEFINED ENV{QT6_ROOT})
+    message(FATAL_ERROR "QT6_ROOT environment variable must be set to the Qt installation prefix (e.g. /qt6/6.11.1/gcc_64)")
 endif()
+set(QT_ROOT "$ENV{QT6_ROOT}")
 set(QT_DIR "${QT_ROOT}/lib/cmake/Qt6")
 set(Qt6_DIR "${QT_ROOT}/lib/cmake/Qt6")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Gui Widgets PrintSupport Svg)
@@ -125,10 +124,7 @@ if(NOT TARGET allthemesgen)
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
 endif()
 
-if(UNIX)
-    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS DBus)
-    add_definitions(-DLINUX -D_LINUX -D_WAYLAND)
-endif()
+
 
 # 3. Definitions & Global Config
 add_definitions(-D__DONT_WRITE_IN_APP_TITLE)

@@ -553,8 +553,16 @@ inline double choose_scaling(double s)
 
 double Utils::getScreenDpiRatio(int scrnum)
 {
-    if (qApp && QGuiApplication::platformName() == "wayland")
+    if (qApp && QGuiApplication::platformName() == "wayland") {
+        // On Wayland, use Qt's devicePixelRatio which reflects the
+        // compositor's scale factor, instead of X11-specific DPI queries.
+        QList<QScreen *> screens = QGuiApplication::screens();
+        if (scrnum >= 0 && scrnum < screens.size())
+            return choose_scaling(screens[scrnum]->devicePixelRatio());
+        if (!screens.isEmpty())
+            return choose_scaling(screens.first()->devicePixelRatio());
         return 1.0;
+    }
     unsigned int _dpi_x = 0;
     unsigned int _dpi_y = 0;
     double nScale = AscAppManager::getInstance().GetMonitorScaleByIndex(scrnum, _dpi_x, _dpi_y);
@@ -563,8 +571,15 @@ double Utils::getScreenDpiRatio(int scrnum)
 
 double Utils::getScreenDpiRatio(const QPoint& pt)
 {
-    if (qApp && QGuiApplication::platformName() == "wayland")
-        return 1.0;
+    if (qApp && QGuiApplication::platformName() == "wayland") {
+        QScreen *screen = nullptr;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+        screen = QGuiApplication::screenAt(pt);
+#endif
+        if (!screen)
+            screen = QGuiApplication::primaryScreen();
+        return screen ? choose_scaling(screen->devicePixelRatio()) : 1.0;
+    }
     QWidget _w;
     _w.setGeometry(QRect(pt, QSize(10,10)));
 
@@ -577,8 +592,13 @@ double Utils::getScreenDpiRatio(const QPoint& pt)
 
 double Utils::getScreenDpiRatioByHWND(int hwnd)
 {
-    if (qApp && QGuiApplication::platformName() == "wayland")
-        return 1.0;
+    if (qApp && QGuiApplication::platformName() == "wayland") {
+        QWidget *widget = QWidget::find((WId)hwnd);
+        if (widget && widget->screen())
+            return choose_scaling(widget->screen()->devicePixelRatio());
+        QScreen *screen = QGuiApplication::primaryScreen();
+        return screen ? choose_scaling(screen->devicePixelRatio()) : 1.0;
+    }
     unsigned int _dpi_x = 0;
     unsigned int _dpi_y = 0;
     double nScale = AscAppManager::getInstance().GetMonitorScaleByWindow((WindowHandleId)hwnd, _dpi_x, _dpi_y);
@@ -587,8 +607,12 @@ double Utils::getScreenDpiRatioByHWND(int hwnd)
 
 double Utils::getScreenDpiRatioByWidget(QWidget* wid)
 {
-    if (qApp && QGuiApplication::platformName() == "wayland")
-        return 1.0;
+    if (qApp && QGuiApplication::platformName() == "wayland") {
+        if (wid && wid->screen())
+            return choose_scaling(wid->screen()->devicePixelRatio());
+        QScreen *screen = QGuiApplication::primaryScreen();
+        return screen ? choose_scaling(screen->devicePixelRatio()) : 1.0;
+    }
     if (!wid)
         return 1;
 
@@ -989,6 +1013,11 @@ namespace WindowHelper {
     }
 
     auto useGtkDialog() -> bool {
+        // On Wayland, prefer XDG Desktop Portal over GTK to avoid
+        // GTK dialogs falling back to Xwayland (wrong scale / click offset).
+        if (QGuiApplication::platformName() == "wayland")
+            return false;
+
         GET_REGISTRY_USER(reg_user)
         bool use_gtk_dialog = true;
         bool saved_flag = reg_user.value("--xdg-desktop-portal", false).toBool();

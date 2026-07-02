@@ -46,6 +46,8 @@
 #else
 # include "platform_linux/linux_window_utils.h"
 # include <QProcess>
+# include <unistd.h>
+# include <sys/types.h>
 # define APP_LAUNCH_NAME "/DesktopEditors"
 # define RESTART_BATCH "/apprestart.sh"
 #endif
@@ -116,7 +118,12 @@ public:
             ts << "del \"%~f0\"&exit\n";
 #else
             ts << "#!/bin/bash\n";
-            ts << "\"" << QString::fromStdWString(NSFile::GetProcessDirectory()) << APP_LAUNCH_NAME << "\" &\n";
+            ts << "sleep 1\n";
+            QString appDir = QString::fromStdWString(NSFile::GetProcessDirectory());
+            ts << "cd \"" << appDir << "\"\n";
+            ts << "LD_LIBRARY_PATH=\"$PWD:$PWD/converter:$LD_LIBRARY_PATH\"";
+            ts << " LD_PRELOAD=libcef.so";
+            ts << " \"" << appDir << APP_LAUNCH_NAME << "\" &\n";
             ts << "rm -- \"$0\"\n";
 #endif
             if (!f.flush()) {
@@ -143,8 +150,17 @@ public:
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
 #else
-        if (!QProcess::startDetached("/bin/sh", QStringList{fileName}))
+        // Use fork/exec instead of QProcess::startDetached because
+        // this runs from a destructor after Qt's event loop has stopped,
+        // where QProcess may not work reliably.
+        pid_t pid = fork();
+        if (pid == 0) {
+            setsid();
+            execlp("/bin/sh", "/bin/sh", fileName.toLocal8Bit().constData(), (char *)nullptr);
+            _exit(1);
+        } else if (pid < 0) {
             CLogger::log("An error occurred while restarting the app!");
+        }
 #endif
     }
 

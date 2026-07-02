@@ -113,7 +113,10 @@ int main( int argc, char *argv[] )
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     }
-    QCoreApplication::setAttribute(Qt::AA_Use96Dpi);
+    // On Wayland, skip AA_Use96Dpi to let the compositor's native DPI
+    // take effect — otherwise Qt overrides DPI, causing fuzzy text.
+    if (!isWayland)
+        QCoreApplication::setAttribute(Qt::AA_Use96Dpi);
 #ifdef _WIN32
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);   // avoid Qt's ANGLE colliding with CEF's libEGL/libGLESv2
 #endif
