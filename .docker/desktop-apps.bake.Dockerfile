@@ -62,7 +62,8 @@ FROM core-base AS desktop-linux
                     libasound2-dev \
                     libpulse-dev \
                     libnss3-dev \
-                    libnspr4-dev && \
+                    libnspr4-dev \
+                    mdbtools-dev && \
         python3 -m venv /opt/venv && \
         /opt/venv/bin/pip install --no-cache-dir aqtinstall
 
