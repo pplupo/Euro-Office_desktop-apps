@@ -470,6 +470,7 @@ install(TARGETS
     DesktopEditors
     ascdocumentscore
     qtascdocumentscore
+    mdbtools
     LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
