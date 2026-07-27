@@ -466,11 +466,15 @@ install(TARGETS
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# mdbtools is only linked by x2t (via BinDocument), not by DesktopEditors
-# itself, so it needs to land next to x2t in converter/ -- x2t's
-# INSTALL_RPATH (set by set_default_options()) only searches $ORIGIN and
-# $ORIGIN/system, not the app root where the other targets above install to.
+# mdbtools/berkeleydb are only linked by x2t (via BinDocument), not by
+# DesktopEditors itself, so they need to land next to x2t in converter/ --
+# x2t's INSTALL_RPATH (set by set_default_options()) only searches $ORIGIN
+# and $ORIGIN/system, not the app root where the other targets above install to.
 install(TARGETS mdbtools
+    LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}/converter
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/converter
+)
+install(IMPORTED_RUNTIME_ARTIFACTS berkeleydb
     LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}/converter
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/converter
 )
