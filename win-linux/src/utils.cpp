@@ -754,7 +754,7 @@ bool Utils::isDatabaseFile(const QString& path)
            path.endsWith(".db", Qt::CaseInsensitive) || path.endsWith(".db3", Qt::CaseInsensitive) ||
            path.endsWith(".duckdb", Qt::CaseInsensitive) || path.endsWith(".parquet", Qt::CaseInsensitive) ||
            path.endsWith(".pq", Qt::CaseInsensitive) || path.endsWith(".mdb", Qt::CaseInsensitive) ||
-           path.endsWith(".accdb", Qt::CaseInsensitive);
+           path.endsWith(".accdb", Qt::CaseInsensitive) || path.endsWith(".bdb", Qt::CaseInsensitive);
 }
 
 void Utils::warnIfDatabaseFile(QWidget* parent, const QString& path)
