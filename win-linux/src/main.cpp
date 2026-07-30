@@ -30,6 +30,7 @@
 # include "platform_linux/singleapplication.h"
 # include "components/cmessage.h"
 # include <unistd.h>
+# include <fcntl.h>
 #endif
 #include "cascapplicationmanagerwrapper.h"
 #include "defines.h"
@@ -41,6 +42,7 @@
 #include "common/File.h"
 #include <QStyleFactory>
 #include <vector>
+#include <memory>
 #include <QGuiApplication>
 #include <QDebug>
 
@@ -211,6 +213,45 @@ int main( int argc, char *argv[] )
     gtk_disable_setlocale();
 #endif
 
+#ifdef __linux
+    // Constructing SingleApplication and the subsequent gtk_init() call
+    // below both drive Fontconfig's first, cold parse of the system's font
+    // config files. Several of those files use XML features (e.g.
+    // xsi:nil) that this build's Fontconfig doesn't understand, so it
+    // prints "invalid attribute"/"invalid constant used" warnings straight
+    // to stderr -- confirmed harmless (font matching still resolves
+    // correctly) and not something this app's own code is responsible
+    // for, so it's suppressed here rather than fixed at the source (system
+    // font configuration this app doesn't own). Scoped narrowly around
+    // just this startup window, not the app's whole lifetime, so any
+    // unrelated stderr output elsewhere is unaffected.
+    struct ScopedStderrSuppress {
+        int saved_fd = -1;
+        ScopedStderrSuppress() {
+            int devnull = open("/dev/null", O_WRONLY);
+            if (devnull < 0) return;
+            saved_fd = dup(STDERR_FILENO);
+            if (saved_fd >= 0) dup2(devnull, STDERR_FILENO);
+            close(devnull);
+        }
+        ~ScopedStderrSuppress() {
+            if (saved_fd >= 0) {
+                dup2(saved_fd, STDERR_FILENO);
+                close(saved_fd);
+            }
+        }
+    };
+    // heap-allocated (not a plain stack scope guard) so its lifetime can end
+    // exactly at gtk_init() below, independent of `app`'s own lifetime --
+    // `app`'s construction has to happen inside the suppressed window, but
+    // `app` itself needs to outlive it. If an early return happens before
+    // reaching the explicit release below (e.g. the !isPrimary() path),
+    // this still restores stderr correctly via its own destructor when
+    // main() returns, just later than the ideal narrow window -- fine,
+    // since the process is exiting either way.
+    auto _suppress_fontconfig_startup_noise = std::make_unique<ScopedStderrSuppress>();
+#endif
+
     SingleApplication app(new_argc, new_argv);
 
     if ( !app.isPrimary() ) {
@@ -239,6 +280,7 @@ int main( int argc, char *argv[] )
     /* gtk_disable_setlocale() already ran above, before app construction */
 #ifdef __linux
     gtk_init(&new_argc, &new_argv);
+    _suppress_fontconfig_startup_noise.reset(); // restore stderr now that the noisy window has passed
 #endif
     CApplicationCEF::Prepare(new_argc, new_argv);
     if (QGuiApplication::platformName() == "wayland") {
