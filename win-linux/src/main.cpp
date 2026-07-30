@@ -202,6 +202,15 @@ int main( int argc, char *argv[] )
         reg_user.remove("lockPortals");
     }
 
+    /* gtk_disable_setlocale() must run before ANY GTK init, including
+     * whatever Qt's own platform theme integration triggers internally --
+     * constructing SingleApplication (a QApplication) is enough to do that
+     * on Linux, so this has to happen first, not at its previous spot right
+     * before the app's own explicit gtk_init() call further down. */
+#ifdef __linux
+    gtk_disable_setlocale();
+#endif
+
     SingleApplication app(new_argc, new_argv);
 
     if ( !app.isPrimary() ) {
@@ -227,9 +236,8 @@ int main( int argc, char *argv[] )
 #endif
     app.setStyle(QStyleFactory::create("Fusion"));
 
-    /* the order is important */
+    /* gtk_disable_setlocale() already ran above, before app construction */
 #ifdef __linux
-    gtk_disable_setlocale();
     gtk_init(&new_argc, &new_argv);
 #endif
     CApplicationCEF::Prepare(new_argc, new_argv);
