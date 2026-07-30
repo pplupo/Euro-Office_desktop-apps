@@ -425,11 +425,15 @@
                 }
 
                 if ( $optsUIScaling ) {
-                    _new_settings.uiscaling = $optsUIScaling.val();
+                    let _uiscaling = $optsUIScaling.val();
                     $optsUIScaling.selectpicker('refresh');
 
-                    if ( appSettings.uiscaling != _new_settings.uiscaling ) {
-                        appSettings.uiscaling = _new_settings.uiscaling;
+                    /* only send uiscaling when it actually changed -- sending it
+                       unconditionally makes the native side treat every Apply
+                       click as a scaling change, see cascapplicationmanagerwrapper.cpp */
+                    if ( appSettings.uiscaling != _uiscaling ) {
+                        _new_settings.uiscaling = _uiscaling;
+                        appSettings.uiscaling = _uiscaling;
                         _new_settings.restart = true;
                     }
                 }

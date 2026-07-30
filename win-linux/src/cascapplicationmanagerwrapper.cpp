@@ -104,6 +104,15 @@ CAscApplicationManagerWrapper::CAscApplicationManagerWrapper(CAscApplicationMana
 CAscApplicationManagerWrapper::~CAscApplicationManagerWrapper()
 {
 #ifndef _CAN_SCALE_IMMEDIATELY
+    /* TODO: setUserSettings() here has been observed to crash on shutdown
+     * (non-deterministic crash site across runs -- CUserSettings/SaveSettings
+     * map operations in desktop-sdk). Root cause not yet found; needs
+     * dedicated investigation (a debug or sanitizer-instrumented build would
+     * help, since release builds lack the symbol/local-variable info needed
+     * to pin down the actual bad access). The JS side now only sends
+     * uiscaling when it actually changed, which keeps this branch from
+     * running on every Settings-Apply, but the underlying risk remains
+     * whenever a real scaling change does take this path. */
     if (!m_private->uiscaling.empty()) {
         setUserSettings(L"system-scale", m_private->uiscaling != L"0" ? L"0" : L"1");
         setUserSettings(L"force-scale", m_private->uiscaling == L"0" ? L"default" : m_private->uiscaling);
