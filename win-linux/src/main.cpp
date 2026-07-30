@@ -30,7 +30,9 @@
 # include "platform_linux/singleapplication.h"
 # include "components/cmessage.h"
 # include <unistd.h>
-# include <fcntl.h>
+# include <sys/mman.h>
+# include <cstdio>
+# include <cstring>
 #endif
 #include "cascapplicationmanagerwrapper.h"
 #include "defines.h"
@@ -221,35 +223,67 @@ int main( int argc, char *argv[] )
     // prints "invalid attribute"/"invalid constant used" warnings straight
     // to stderr -- confirmed harmless (font matching still resolves
     // correctly) and not something this app's own code is responsible
-    // for, so it's suppressed here rather than fixed at the source (system
-    // font configuration this app doesn't own). Scoped narrowly around
-    // just this startup window, not the app's whole lifetime, so any
-    // unrelated stderr output elsewhere is unaffected.
-    struct ScopedStderrSuppress {
+    // for, so this is filtered out rather than fixed at the source (system
+    // font configuration this app doesn't own).
+    //
+    // Fontconfig has no callback/API hook for its diagnostic output -- it's
+    // a plain fprintf(stderr, ...) from inside a shared library we don't
+    // control -- so seeing what it wrote in order to filter by content
+    // means capturing the raw bytes somewhere readable first. Captured into
+    // an in-memory fd (memfd_create, no disk I/O, no path/cleanup to manage)
+    // rather than a pipe: gtk_init() runs synchronously and writes into this
+    // fd on the same thread, so a pipe's fixed kernel buffer could in
+    // principle deadlock the write if the captured output ever got large
+    // enough to fill it before we come back to drain it; a memfd has no
+    // such ceiling.
+    struct ScopedStderrFilter {
         int saved_fd = -1;
-        ScopedStderrSuppress() {
-            int devnull = open("/dev/null", O_WRONLY);
-            if (devnull < 0) return;
+        int capture_fd = -1;
+
+        ScopedStderrFilter() {
+            capture_fd = memfd_create("eo_stderr_capture", 0);
+            if (capture_fd < 0) return;
             saved_fd = dup(STDERR_FILENO);
-            if (saved_fd >= 0) dup2(devnull, STDERR_FILENO);
-            close(devnull);
+            if (saved_fd >= 0) dup2(capture_fd, STDERR_FILENO);
         }
-        ~ScopedStderrSuppress() {
-            if (saved_fd >= 0) {
-                dup2(saved_fd, STDERR_FILENO);
-                close(saved_fd);
+
+        ~ScopedStderrFilter() {
+            if (saved_fd < 0) {
+                if (capture_fd >= 0) close(capture_fd);
+                return;
             }
+
+            // restore the real stderr first so filtered-through lines
+            // actually reach it
+            dup2(saved_fd, STDERR_FILENO);
+            close(saved_fd);
+
+            if (capture_fd < 0) return;
+            lseek(capture_fd, 0, SEEK_SET);
+            FILE* f = fdopen(capture_fd, "r"); // takes ownership of capture_fd
+            if (!f) {
+                close(capture_fd);
+                return;
+            }
+            char line[4096];
+            while (fgets(line, sizeof(line), f)) {
+                if (strncmp(line, "Fontconfig error:", 17) != 0 &&
+                    strncmp(line, "Fontconfig warning:", 19) != 0) {
+                    fputs(line, stderr);
+                }
+            }
+            fclose(f); // also closes capture_fd
         }
     };
     // heap-allocated (not a plain stack scope guard) so its lifetime can end
     // exactly at gtk_init() below, independent of `app`'s own lifetime --
-    // `app`'s construction has to happen inside the suppressed window, but
+    // `app`'s construction has to happen inside the captured window, but
     // `app` itself needs to outlive it. If an early return happens before
     // reaching the explicit release below (e.g. the !isPrimary() path),
-    // this still restores stderr correctly via its own destructor when
-    // main() returns, just later than the ideal narrow window -- fine,
-    // since the process is exiting either way.
-    auto _suppress_fontconfig_startup_noise = std::make_unique<ScopedStderrSuppress>();
+    // this still restores and filters stderr correctly via its own
+    // destructor when main() returns, just later than the ideal narrow
+    // window -- fine, since the process is exiting either way.
+    auto _filter_fontconfig_startup_noise = std::make_unique<ScopedStderrFilter>();
 #endif
 
     SingleApplication app(new_argc, new_argv);
@@ -280,7 +314,7 @@ int main( int argc, char *argv[] )
     /* gtk_disable_setlocale() already ran above, before app construction */
 #ifdef __linux
     gtk_init(&new_argc, &new_argv);
-    _suppress_fontconfig_startup_noise.reset(); // restore stderr now that the noisy window has passed
+    _filter_fontconfig_startup_noise.reset(); // restore + filter stderr now that the captured window has passed
 #endif
     CApplicationCEF::Prepare(new_argc, new_argv);
     if (QGuiApplication::platformName() == "wayland") {
