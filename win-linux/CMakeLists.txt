@@ -163,6 +163,7 @@ set(COMMON_HEADERS
     src/cascapplicationmanagerwrapper_private.h
     src/casctabdata.h
     src/utils.h
+    src/docautomation.h
     src/chelp.h
     src/cfilechecker.h
     src/clogger.h
@@ -183,6 +184,8 @@ set(COMMON_HEADERS
 set(COMMON_SOURCES
     src/prop/cmainwindowimpl.cpp
     src/prop/utils.cpp
+    src/utils.cpp
+    src/docautomation.cpp
     src/windows/cmainwindow.cpp
     src/windows/cwindowbase.cpp
     src/windows/ceditorwindow.cpp

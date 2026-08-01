@@ -39,6 +39,7 @@
 #include "utils.h"
 #include "chelp.h"
 #include "common/File.h"
+#include "docautomation.h"
 #include <QStyleFactory>
 #include <vector>
 #include <QGuiApplication>
@@ -93,6 +94,9 @@ int main( int argc, char *argv[] )
         return 0;
     }
 #endif
+    if ( NSDocAutomation::ShouldRun() ) {
+        return NSDocAutomation::Run();
+    }
 #ifdef __linux
     char* qpaPlatform = getenv("QT_QPA_PLATFORM");
     char* xdgSessionType = getenv("XDG_SESSION_TYPE");
