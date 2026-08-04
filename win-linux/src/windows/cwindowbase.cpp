@@ -37,6 +37,8 @@
 #include <QHBoxLayout>
 #include <QScreen>
 #include <functional>
+#include <QDateTime>
+#include "qdpichecker.h"
 
 
 class CWindowBase::CWindowBasePrivate
@@ -246,6 +248,53 @@ bool CWindowBase::event(QEvent *event)
     return QMainWindow::event(event);
 }
 
+namespace {
+// TEMPORARY diagnostic: dump every input the title-bar/tab-strip sizing
+// depends on, at the exact moment the chrome is sized. Written per call to
+// /tmp/euro_office_scaling_debug.log so a Wayland and an X11 session can be
+// compared line-for-line. The decisive columns are dpiRatio (the factor the
+// app applies manually) and widgetDPR (the factor the compositor applies on
+// top): their product is the chrome's real physical scale, while CEF content
+// is scaled by widgetDPR alone.
+void logChromeScalingInputs(QWidget * window, double factor,
+                            int logicalBtnWidth, int logicalBtnHeight)
+{
+    FILE * log = fopen("/tmp/euro_office_scaling_debug.log", "a");
+    if (!log)
+        return;
+
+    QScreen * scr = window->screen();
+    const int scrIndex = QApplication::screens().indexOf(scr);
+
+    unsigned int monDpiX = 0, monDpiY = 0, widDpiX = 0, widDpiY = 0;
+    if (QDpiChecker * checker = (QDpiChecker *)AscAppManager::getInstance().GetDpiChecker()) {
+        checker->GetMonitorDpi(scrIndex, &monDpiX, &monDpiY);
+        checker->GetWidgetDpi(window, &widDpiX, &widDpiY);
+    }
+
+    const double widgetDpr = window->devicePixelRatio();
+
+    fprintf(log,
+        "[%lld] platform=%s class=%s screen=%d(%s) screenSize=%dx%d "
+        "physDpi=%.1fx%.1f logDpi=%.1fx%.1f screenDPR=%.4f widgetDPR=%.4f "
+        "monitorDpi=%ux%u widgetDpi=%ux%u dpiRatio=%.4f "
+        "btnLogical=%dx%d btnPhysical=%.1fx%.1f effectiveScale=%.4f\n",
+        QDateTime::currentMSecsSinceEpoch(),
+        QGuiApplication::platformName().toUtf8().constData(),
+        window->metaObject()->className(),
+        scrIndex, scr ? scr->name().toUtf8().constData() : "?",
+        scr ? scr->size().width() : -1, scr ? scr->size().height() : -1,
+        scr ? scr->physicalDotsPerInchX() : -1.0, scr ? scr->physicalDotsPerInchY() : -1.0,
+        scr ? scr->logicalDotsPerInchX() : -1.0, scr ? scr->logicalDotsPerInchY() : -1.0,
+        scr ? scr->devicePixelRatio() : -1.0, widgetDpr,
+        monDpiX, monDpiY, widDpiX, widDpiY, factor,
+        logicalBtnWidth, logicalBtnHeight,
+        logicalBtnWidth * widgetDpr, logicalBtnHeight * widgetDpr,
+        factor * widgetDpr);
+    fclose(log);
+}
+}
+
 void CWindowBase::setScreenScalingFactor(double factor, bool resize)
 {
     if (resize && !isMaximized()) {
@@ -265,6 +314,7 @@ void CWindowBase::setScreenScalingFactor(double factor, bool resize)
             QSize small_btn_size(int(TITLEBTN_WIDTH*m_dpiRatio), int(m_toolbtn_height * m_dpiRatio));
             foreach (auto pBtn, m_pTopButtons)
                 pBtn->setFixedSize(small_btn_size);
+            logChromeScalingInputs(this, factor, small_btn_size.width(), small_btn_size.height());
         }
     }
 }
