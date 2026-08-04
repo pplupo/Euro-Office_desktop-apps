@@ -578,14 +578,20 @@ double Utils::getScreenDpiRatioByHWND(int hwnd)
 
 double Utils::getScreenDpiRatioByWidget(QWidget* wid)
 {
-    // Manual DPI scaling here (multiplying sizes by dpiRatio) computes a
-    // logical/DIP size for widgets that don't rely purely on Qt's layout
-    // system (e.g. cplatformdecoration.cpp's CUSTOM_BORDER_WIDTH * ratio).
-    // That's independent of Qt's own automatic HiDPI backing-store
-    // scaling (which just renders whatever DIP size is chosen more
-    // crisply) -- it's needed on Wayland exactly the same way it's
-    // needed on X11, so this used to (incorrectly) skip it with a flat
-    // 1.0 return on Wayland, leaving those widgets sized as if unscaled.
+    // On Wayland, Qt's compositor automatically scales every widget's
+    // logical-pixel size to physical pixels by devicePixelRatio at render
+    // time. Manual * dpiRatio in widget-sizing code would be applied on
+    // top of that automatic scale, producing double-scaling: a 2× display
+    // would render a TITLEBTN_WIDTH*2.0 button at 4× the intended physical
+    // size. CEF content scale is handled independently via
+    // QCefView::GetUIScalePercentage() → devicePixelRatio() directly, so
+    // it is unaffected by this early-return.
+    // On X11, Qt does NOT auto-scale, so the full dpiRatio must be applied
+    // manually by callers, and we fall through to the real measurement below.
+#ifdef Q_OS_LINUX
+    if (QGuiApplication::platformName() == QLatin1String("wayland"))
+        return 1.0;
+#endif
     if (!wid)
         return 1;
 
