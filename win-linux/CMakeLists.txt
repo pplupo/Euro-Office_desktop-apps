@@ -26,6 +26,13 @@ if(UNIX)
     add_definitions(-DLINUX -D_LINUX -D_WAYLAND)
 endif()
 
+# Gateway (see cdp-gateway-cli-plan.md): GatewayCommandRunner drives CDP in-process via
+# CCefView::SendGatewayDevToolsMessage (CefBrowserHost::SendDevToolsMessage under the
+# hood) -- no external --remote-debugging-port, no WebSocket client needed. An earlier
+# design used Qt6WebSockets against an external CDP port; dropped after investigation
+# showed the in-process CefBrowserHost API solves target resolution for free (see
+# gatewaycommandrunner.h and the desktop-sdk cefview.h/.cpp changes on this branch).
+
 if(NOT TARGET hunspell-wrapper)
     add_subdirectory(${CORE_ROOT_DIR}/Common/3dParty/hunspell/qt hunspell-wrapper)
 endif()
@@ -114,6 +121,13 @@ if(NOT TARGET allthemesgen)
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
 endif()
 
+if(NOT TARGET eo-ctl)
+    add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tools/eo-ctl/build/cmake" eo-ctl )
+endif()
+
+enable_testing()
+add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tests/gateway" gateway_tests )
+
 
 
 # 3. Definitions & Global Config
@@ -132,6 +146,11 @@ endif()
 
 # 4. Source and Header Lists
 set(COMMON_HEADERS
+    src/gateway/gatewaytypes.h
+    src/gateway/allowlist.h
+    src/gateway/gatewaycommandrunner.h
+    src/gateway/gatewayserver.h
+    src/gateway/commands/wordcommands.h
     src/prop/defines_p.h
     src/prop/cascapplicationmanagerwrapperintf.h
     src/prop/version_p.h
@@ -182,6 +201,10 @@ set(COMMON_HEADERS
 )
 
 set(COMMON_SOURCES
+    src/gateway/allowlist.cpp
+    src/gateway/gatewaycommandrunner.cpp
+    src/gateway/gatewayserver.cpp
+    src/gateway/commands/wordcommands.cpp
     src/prop/cmainwindowimpl.cpp
     src/prop/utils.cpp
     src/docautomation.cpp
