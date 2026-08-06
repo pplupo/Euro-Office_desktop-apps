@@ -26,6 +26,13 @@ if(UNIX)
     add_definitions(-DLINUX -D_LINUX -D_WAYLAND)
 endif()
 
+# Gateway (see cdp-gateway-cli-plan.md): CDP's Runtime.evaluate is JSON-RPC over a
+# WebSocket, so GatewayCommandRunner needs a WebSocket client. Qt6WebSockets is the
+# same Qt family already used throughout this app, chosen over hand-rolling a
+# WebSocket client to keep the gateway's own code small (decided with the user, see
+# plan §0 history — not a default/unreviewed dependency addition).
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS WebSockets)
+
 if(NOT TARGET hunspell-wrapper)
     add_subdirectory(${CORE_ROOT_DIR}/Common/3dParty/hunspell/qt hunspell-wrapper)
 endif()
@@ -114,6 +121,13 @@ if(NOT TARGET allthemesgen)
     add_subdirectory( "${CORE_ROOT_DIR}/DesktopEditor/allthemesgen" allthemesgen )
 endif()
 
+if(NOT TARGET eo-ctl)
+    add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tools/eo-ctl/build/cmake" eo-ctl )
+endif()
+
+enable_testing()
+add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tests/gateway" gateway_tests )
+
 
 
 # 3. Definitions & Global Config
@@ -132,6 +146,11 @@ endif()
 
 # 4. Source and Header Lists
 set(COMMON_HEADERS
+    src/gateway/gatewaytypes.h
+    src/gateway/allowlist.h
+    src/gateway/gatewaycommandrunner.h
+    src/gateway/gatewayserver.h
+    src/gateway/commands/wordcommands.h
     src/prop/defines_p.h
     src/prop/cascapplicationmanagerwrapperintf.h
     src/prop/version_p.h
@@ -181,6 +200,10 @@ set(COMMON_HEADERS
 )
 
 set(COMMON_SOURCES
+    src/gateway/allowlist.cpp
+    src/gateway/gatewaycommandrunner.cpp
+    src/gateway/gatewayserver.cpp
+    src/gateway/commands/wordcommands.cpp
     src/prop/cmainwindowimpl.cpp
     src/prop/utils.cpp
     src/windows/cmainwindow.cpp
@@ -381,6 +404,7 @@ target_link_libraries(DesktopEditors PRIVATE
     Qt${QT_VERSION_MAJOR}::Multimedia
     Qt${QT_VERSION_MAJOR}::MultimediaWidgets
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+    Qt${QT_VERSION_MAJOR}::WebSockets
     ${PLATFORM_LIBS}
     ${DBUS_LIBRARIES}
 
