@@ -487,6 +487,7 @@ install(TARGETS
     DesktopEditors
     ascdocumentscore
     qtascdocumentscore
+    eo-ctl
     LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
