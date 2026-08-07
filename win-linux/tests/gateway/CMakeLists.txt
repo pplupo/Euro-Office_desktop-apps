@@ -615,3 +615,234 @@ add_test(
     NAME gateway_cell_smartart
     COMMAND gateway_cell_smartart_test
 )
+
+add_executable(gateway_slide_management_test
+    slide_management_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_management_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_management_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_management
+    COMMAND gateway_slide_management_test
+)
+
+add_executable(gateway_slide_content_enumeration_test
+    slide_content_enumeration_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_content_enumeration_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_content_enumeration_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_content_enumeration
+    COMMAND gateway_slide_content_enumeration_test
+)
+
+add_executable(gateway_slide_layout_master_test
+    slide_layout_master_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_layout_master_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_layout_master_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_layout_master
+    COMMAND gateway_slide_layout_master_test
+)
+
+add_executable(gateway_slide_transition_test
+    slide_transition_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_transition_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_transition_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_transition
+    COMMAND gateway_slide_transition_test
+)
+
+add_executable(gateway_slide_shape_test
+    slide_shape_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_shape_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_shape_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_shape
+    COMMAND gateway_slide_shape_test
+)
+
+add_executable(gateway_slide_text_formatting_test
+    slide_text_formatting_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_text_formatting_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_text_formatting_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_text_formatting
+    COMMAND gateway_slide_text_formatting_test
+)
+
+add_executable(gateway_slide_image_test
+    slide_image_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_image_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_image_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_image
+    COMMAND gateway_slide_image_test
+)
+
+add_executable(gateway_slide_table_test
+    slide_table_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_table_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_table_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_table
+    COMMAND gateway_slide_table_test
+)
+
+add_executable(gateway_slide_notes_test
+    slide_notes_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_notes_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_notes_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_notes
+    COMMAND gateway_slide_notes_test
+)
+
+add_executable(gateway_slide_comment_test
+    slide_comment_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_comment_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_comment_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_comment
+    COMMAND gateway_slide_comment_test
+)
+
+add_executable(gateway_slide_document_properties_test
+    slide_document_properties_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/slidecommands.cpp
+)
+
+set_target_properties(gateway_slide_document_properties_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_slide_document_properties_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_slide_document_properties
+    COMMAND gateway_slide_document_properties_test
+)
