@@ -114,6 +114,10 @@ FROM core-base AS desktop-linux
         --mount=type=cache,target=/ccache,id=ccache \
         export CCACHE_DIR=/ccache && \
         cd /build-cache-desktop && \
+        echo "=== DEBUG: find libQt6Core.so* ===" && \
+        (find / -xdev -iname 'libQt6Core.so*' 2>/dev/null || true) && \
+        echo "=== DEBUG: readelf RPATH/RUNPATH on gateway_word_document_properties_test ===" && \
+        (readelf -d gateway_tests/gateway_word_document_properties_test | grep -i 'rpath\|runpath' || true) && \
         ctest --test-dir . --output-on-failure && \
         cmake --install . && \
         ccache --show-stats && \
