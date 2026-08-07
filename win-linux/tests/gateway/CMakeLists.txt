@@ -279,3 +279,339 @@ add_test(
     NAME gateway_word_comment_revision
     COMMAND gateway_word_comment_revision_test
 )
+
+add_executable(gateway_cell_sheet_management_test
+    cell_sheet_management_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_sheet_management_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_sheet_management_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_sheet_management
+    COMMAND gateway_cell_sheet_management_test
+)
+
+add_executable(gateway_cell_range_read_write_test
+    cell_range_read_write_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_range_read_write_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_range_read_write_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_range_read_write
+    COMMAND gateway_cell_range_read_write_test
+)
+
+add_executable(gateway_cell_number_format_merge_clear_test
+    cell_number_format_merge_clear_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_number_format_merge_clear_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_number_format_merge_clear_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_number_format_merge_clear
+    COMMAND gateway_cell_number_format_merge_clear_test
+)
+
+add_executable(gateway_cell_copy_find_replace_test
+    cell_copy_find_replace_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_copy_find_replace_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_copy_find_replace_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_copy_find_replace
+    COMMAND gateway_cell_copy_find_replace_test
+)
+
+add_executable(gateway_cell_formatting_test
+    cell_formatting_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_formatting_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_formatting_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_formatting
+    COMMAND gateway_cell_formatting_test
+)
+
+add_executable(gateway_cell_conditional_formatting_test
+    cell_conditional_formatting_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_conditional_formatting_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_conditional_formatting_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_conditional_formatting
+    COMMAND gateway_cell_conditional_formatting_test
+)
+
+add_executable(gateway_cell_validation_defname_test
+    cell_validation_defname_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_validation_defname_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_validation_defname_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_validation_defname
+    COMMAND gateway_cell_validation_defname_test
+)
+
+add_executable(gateway_cell_autofilter_test
+    cell_autofilter_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_autofilter_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_autofilter_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_autofilter
+    COMMAND gateway_cell_autofilter_test
+)
+
+add_executable(gateway_cell_pivot_table_test
+    cell_pivot_table_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_pivot_table_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_pivot_table_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_pivot_table
+    COMMAND gateway_cell_pivot_table_test
+)
+
+add_executable(gateway_cell_freeze_panes_test
+    cell_freeze_panes_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_freeze_panes_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_freeze_panes_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_freeze_panes
+    COMMAND gateway_cell_freeze_panes_test
+)
+
+add_executable(gateway_cell_image_ole_test
+    cell_image_ole_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_image_ole_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_image_ole_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_image_ole
+    COMMAND gateway_cell_image_ole_test
+)
+
+add_executable(gateway_cell_comment_reply_test
+    cell_comment_reply_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_comment_reply_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_comment_reply_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_comment_reply
+    COMMAND gateway_cell_comment_reply_test
+)
+
+add_executable(gateway_cell_insert_delete_rowcol_test
+    cell_insert_delete_rowcol_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_insert_delete_rowcol_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_insert_delete_rowcol_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_insert_delete_rowcol
+    COMMAND gateway_cell_insert_delete_rowcol_test
+)
+
+add_executable(gateway_cell_recalculate_test
+    cell_recalculate_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_recalculate_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_recalculate_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_recalculate
+    COMMAND gateway_cell_recalculate_test
+)
+
+add_executable(gateway_cell_chart_test
+    cell_chart_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_chart_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_chart_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_chart
+    COMMAND gateway_cell_chart_test
+)
+
+add_executable(gateway_cell_smartart_test
+    cell_smartart_test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/allowlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../src/gateway/commands/cellcommands.cpp
+)
+
+set_target_properties(gateway_cell_smartart_test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    AUTOMOC ON
+)
+
+target_link_libraries(gateway_cell_smartart_test PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+)
+
+add_test(
+    NAME gateway_cell_smartart
+    COMMAND gateway_cell_smartart_test
+)
