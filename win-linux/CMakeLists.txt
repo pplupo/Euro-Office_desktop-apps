@@ -127,6 +127,7 @@ endif()
 
 enable_testing()
 add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tests/gateway" gateway_tests )
+add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/tools/eo-ctl/tests" eo_ctl_tests )
 
 
 
